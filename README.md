@@ -1,3 +1,8 @@
+[![Audit](https://github.com/hamirmahal/max-matrix-path/actions/workflows/audit.yml/badge.svg)](https://github.com/hamirmahal/max-matrix-path/actions/workflows/audit.yml)
+[![Check](https://github.com/hamirmahal/max-matrix-path/actions/workflows/check.yml/badge.svg)](https://github.com/hamirmahal/max-matrix-path/actions/workflows/check.yml)
+[![Lighthouse](https://github.com/hamirmahal/max-matrix-path/actions/workflows/lighthouse.yml/badge.svg)](https://github.com/hamirmahal/max-matrix-path/actions/workflows/lighthouse.yml)
+[![Test](https://github.com/hamirmahal/max-matrix-path/actions/workflows/test.yml/badge.svg)](https://github.com/hamirmahal/max-matrix-path/actions/workflows/test.yml)
+
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
 ## Getting Started
