@@ -1,16 +1,71 @@
 "use client";
 import mixpanel from "mixpanel-browser";
 import React from "react";
+import type { MatrixType } from "./worker";
 
-type MatrixType = number[][];
+const LoadingSpinner: React.FC = () => (
+  <svg
+    className="inline-block h-4 w-4 animate-spin text-blue-500"
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+  >
+    <circle
+      className="opacity-25"
+      cx="12"
+      cy="12"
+      r="10"
+      stroke="currentColor"
+      strokeWidth="4"
+    />
+    <path
+      className="opacity-75"
+      fill="currentColor"
+      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+    />
+  </svg>
+);
+
 const MatrixRenderer: React.FC<{ matrix: MatrixType }> = ({ matrix }) => {
-  const { maximalPath, maximalSum } = getMaximalPathAndSum(matrix);
+  const [loading, setLoading] = React.useState(false);
+  const [maximalSum, setMaximalSum] = React.useState(60);
+  const [maximalPath, setMaximalPath] = React.useState<[number, number][]>([
+    [4, 2],
+    [3, 2],
+    [3, 1],
+    [3, 0],
+    [2, 0],
+    [2, 1],
+    [2, 2],
+    [2, 3],
+    [2, 4],
+    [3, 4],
+    [4, 4],
+  ]);
+  React.useEffect(() => {
+    setLoading(true);
+    const worker = new Worker(new URL("./worker.ts", import.meta.url));
+    worker.onmessage = (e) => {
+      const { maximalPath, maximalSum } = e.data;
+      setMaximalPath(maximalPath);
+      setMaximalSum(maximalSum);
+      setLoading(false);
+    };
+    worker.postMessage({ matrix });
+
+    return () => {
+      worker.terminate();
+    };
+  }, [matrix]);
   return (
     <>
       <p className="mb-6 text-xl">
         A path with the maximal sum that avoids zeroes and visits each cell at
         most once is highlighted. The sum of values on that path is{" "}
-        <strong>{maximalSum}</strong>.
+        <strong>{maximalSum}</strong>.{" "}
+        <span className="inline-block w-5">
+          {loading && <LoadingSpinner />}
+        </span>
       </p>
       <table className="mx-auto border-collapse border border-gray-300">
         <tbody>
@@ -177,118 +232,9 @@ const track = debounce((input: unknown) => {
   }
 }, 3000);
 
-const getMaximalPathAndSum = (grid: MatrixType) => {
-  let maximalPath = [] as [number, number][];
-  let maximalSum = 0;
-  const dfs = (
-    row: number,
-    col: number,
-    current: number,
-    currentPath: [number, number][],
-  ) => {
-    if (!grid[row]?.[col]) return;
-    const runningTotal = grid[row][col] + current;
-    currentPath.push([row, col]);
-    maximalPath = runningTotal > maximalSum ? [...currentPath] : maximalPath;
-    maximalSum = Math.max(maximalSum, runningTotal);
-    grid[row][col] = 0;
-    dfs(row - 1, col, runningTotal, currentPath);
-    dfs(row + 1, col, runningTotal, currentPath);
-    dfs(row, col - 1, runningTotal, currentPath);
-    dfs(row, col + 1, runningTotal, currentPath);
-    grid[row][col] = runningTotal - current;
-    currentPath.pop();
-  };
-  for (let r = 0; r < grid.length; r += 1) {
-    for (let c = 0; c < grid[r].length; c += 1) {
-      dfs(r, c, 0, []);
-    }
-  }
-  return {
-    maximalPath,
-    maximalSum,
-  };
-};
-
 // in-source test suites
 if (import.meta.vitest) {
   const { it, expect } = import.meta.vitest;
-  const testCase1 = {
-    matrix: [
-      [0, 6, 0],
-      [5, 8, 7],
-      [0, 9, 0],
-    ],
-    expectedPath: [
-      [1, 2],
-      [1, 1],
-      [2, 1],
-    ],
-    expectedSum: 24,
-  };
-  const testCase2 = {
-    matrix: [
-      [1, 0, 7],
-      [2, 0, 6],
-      [3, 4, 5],
-      [0, 3, 0],
-      [9, 0, 20],
-    ],
-    expectedPath: [
-      [0, 0],
-      [1, 0],
-      [2, 0],
-      [2, 1],
-      [2, 2],
-      [1, 2],
-      [0, 2],
-    ],
-    expectedSum: 28,
-  };
-  const testCase3 = {
-    matrix: [
-      [1, 0, 7, 0, 0, 0],
-      [2, 0, 6, 0, 1, 0],
-      [3, 5, 6, 7, 4, 2],
-      [4, 3, 1, 0, 2, 0],
-      [3, 0, 5, 0, 20, 0],
-    ],
-    expectedPath: [
-      [4, 2],
-      [3, 2],
-      [3, 1],
-      [3, 0],
-      [2, 0],
-      [2, 1],
-      [2, 2],
-      [2, 3],
-      [2, 4],
-      [3, 4],
-      [4, 4],
-    ],
-    expectedSum: 60,
-  };
-  const testCase4 = {
-    matrix: [
-      [0, 0, 0],
-      [0, 0, 0],
-    ],
-    expectedPath: [],
-    expectedSum: 0,
-  };
-  const testCase5 = {
-    matrix: [[0]],
-    expectedPath: [],
-    expectedSum: 0,
-  };
-  const testCases = [testCase1, testCase2, testCase3, testCase4, testCase5];
-  it("returns the coordinates of the maximal path", () => {
-    testCases.forEach(({ matrix, expectedPath, expectedSum }) => {
-      const { maximalPath, maximalSum } = getMaximalPathAndSum(matrix);
-      expect(maximalPath).toEqual(expectedPath);
-      expect(maximalSum).toBe(expectedSum);
-    });
-  });
   it("validates input as a matrix", () => {
     expect(inputIsMatrix([])).toBe(true);
     expect(inputIsMatrix([[]])).toBe(true);
@@ -297,8 +243,5 @@ if (import.meta.vitest) {
     expect(inputIsMatrix([1, 2, 3])).toBe(false);
     expect(inputIsMatrix([[1, 2], [3]])).toBe(true);
     expect(inputIsMatrix([[1], [2], [3]])).toBe(true);
-    testCases.forEach(({ matrix }) => {
-      expect(inputIsMatrix(matrix)).toBe(true);
-    });
   });
 }
