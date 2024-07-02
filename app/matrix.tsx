@@ -61,7 +61,6 @@ const MatrixRenderer: React.FC<{ matrix: MatrixType }> = ({ matrix }) => {
  * ```
  * takes a while, but should finish in a reasonable amount of time.
  */
-const theMaximumNumberOfNonZeroElements = 27;
 const debug = process.env.NODE_ENV === "development";
 const inputIsMatrix = (input: unknown): input is MatrixType =>
   Array.isArray(input) &&
@@ -102,16 +101,6 @@ const Matrix = () => {
     try {
       const inputMatrix = JSON.parse(event.target.value);
       if (inputIsMatrix(inputMatrix)) {
-        const theNumberOfNonZeroElements = inputMatrix
-          .flat()
-          .filter(Boolean).length;
-        if (theNumberOfNonZeroElements > theMaximumNumberOfNonZeroElements) {
-          const warning = `The matrix has ${theNumberOfNonZeroElements} nonzero elements, which is more than the recommended maximum of ${theMaximumNumberOfNonZeroElements}. Attempting to process it may make the page unresponsive.`;
-          const proceeding = confirm(`${warning} Do you want to proceed?`);
-          if (!proceeding) {
-            throw new Error(`Invalid input: ${warning}`);
-          }
-        }
         setError("");
         setMatrix(inputMatrix);
         track(inputMatrix);
