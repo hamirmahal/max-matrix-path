@@ -10,6 +10,7 @@ const LoadingSpinner: React.FC = () => (
     fill="none"
     viewBox="0 0 24 24"
   >
+    <title>Loading Spinner</title>
     <circle
       className="opacity-25"
       cx="12"
