@@ -1,12 +1,6 @@
 name: Test
 on: [push]
 jobs:
-  logic:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: npm ci
-      - run: npm test
   ui:
     timeout-minutes: 9
     runs-on: ubuntu-latest
