@@ -1,0 +1,4 @@
+npm audit
+npm run check-types
+npm run check-formatting
+npm run test-non-interactive
