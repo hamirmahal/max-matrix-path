@@ -1,6 +1,6 @@
 export type MatrixType = number[][];
 
-self.onmessage = function (e: MessageEvent<{ matrix: MatrixType }>) {
+self.onmessage = (e: MessageEvent<{ matrix: MatrixType }>) => {
   const { matrix } = e.data;
   const result = getMaximalPathAndSum(matrix);
   self.postMessage(result);
