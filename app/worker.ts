@@ -1,6 +1,6 @@
 export type MatrixType = number[][];
 
-self.onmessage = function (e: MessageEvent<{ matrix: MatrixType }>) {
+self.onmessage = (e: MessageEvent<{ matrix: MatrixType }>) => {
   const { matrix } = e.data;
   const result = getMaximalPathAndSum(matrix);
   self.postMessage(result);
@@ -116,10 +116,10 @@ if (import.meta.vitest) {
   };
   const testCases = [testCase1, testCase2, testCase3, testCase4, testCase5];
   it("returns the coordinates of the maximal path", () => {
-    testCases.forEach(({ matrix, expectedPath, expectedSum }) => {
+    for (const { matrix, expectedPath, expectedSum } of testCases) {
       const { maximalPath, maximalSum } = getMaximalPathAndSum(matrix);
       expect(maximalPath).toEqual(expectedPath);
       expect(maximalSum).toBe(expectedSum);
-    });
+    }
   });
 }
