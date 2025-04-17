@@ -4,6 +4,7 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
+    "target": "ES2017",
     "types": ["vitest/importMeta"],
     "noEmit": true,
     "esModuleInterop": true,
