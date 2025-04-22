@@ -1,0 +1,19 @@
+# https://dev.to/joerismits/ensure-your-nextjs-apps-performance-is-top-notch-with-lighthouse-ci-and-github-actions-4ne8#integrate-lighthouse-ci-with-github-actions
+# The results will be attached as new status checks and will pass or fail based on
+# the assert configuration in `.lighthouserc.json`.
+# Remember to add `LHCI_GITHUB_APP_TOKEN` to your repository secrets, and
+# add this repository to the Lighthouse CI GitHub App.
+name: Lighthouse
+on: [push]
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - run: npm install && npm install -g @lhci/cli
+      - run: npm run build
+      - run: lhci collect
+      - run: lhci upload
+        env:
+          LHCI_GITHUB_APP_TOKEN: ${{ secrets.LHCI_GITHUB_APP_TOKEN }}
