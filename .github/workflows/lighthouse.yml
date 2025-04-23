@@ -3,11 +3,14 @@
 # the assert configuration in `.lighthouserc.json`.
 # Remember to add `LHCI_GITHUB_APP_TOKEN` to your repository secrets, and
 # add this repository to the Lighthouse CI GitHub App.
-name: Lighthouse
 on: [push]
+
+name: Lighthouse
 jobs:
   lighthouse:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -1,9 +1,12 @@
-name: Test
 on: [push]
+
+name: Test
 jobs:
   ui:
     timeout-minutes: 9
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
